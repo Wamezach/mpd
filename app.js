@@ -655,3 +655,22 @@ select.addEventListener('change', async () => {
     console.error("Failed to load channel:", error);
   }
 });
+const defaultChannelKey = "gma_pinoy_tv";
+
+// Function to initialize player with a channel
+function loadChannel(channelKey) {
+  const channel = channels[channelKey];
+  if (!channel) {
+    console.error("Channel not found:", channelKey);
+    return;
+  }
+
+  // Example: initialize your player here with channel.url and channel.keys
+  console.log("Loading channel:", channel.name);
+
+  // Your player initialization code here, e.g.:
+  // initializePlayer(channel.url, channel.keys);
+}
+
+// On page or player load, call this:
+loadChannel(defaultChannelKey);
