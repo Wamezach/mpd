@@ -1,67 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>IPTV Player - Renkaku Style</title>
+  <meta charset="UTF-8">
+  <title>Renkaku IPTV Player</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.5/shaka-player.compiled.min.js"></script>
   <style>
     body {
-      margin: 0;
+      font-family: Arial, sans-serif;
+      padding: 20px;
       background: #111;
       color: #fff;
-      font-family: sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 2rem;
+    }
+    select {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      margin-bottom: 20px;
     }
     video {
-      width: 90%;
-      max-width: 960px;
-      background: black;
-      margin-bottom: 1rem;
-    }
-    select, ul {
-      margin: 0.5rem;
-      padding: 0.5rem;
-      font-size: 16px;
-      width: 300px;
-    }
-    ul {
-      list-style: none;
-      padding: 0;
-    }
-    li {
-      cursor: pointer;
-      background: #222;
-      margin: 5px 0;
-      padding: 10px;
-      border-radius: 4px;
-    }
-    li:hover {
-      background: #444;
+      width: 100%;
+      height: auto;
+      background: #000;
     }
   </style>
 </head>
 <body>
-  <video id="video" controls autoplay muted></video>
 
-  <select id="channelDropdown">
-    <option value="dreamworks">DreamWorks HD</option>
-    <option value="cnvg">KAPAMILYA TFC</option>
-    <option value="converge">CONVERGE VISION INFO</option>
+  <h1>Renkaku IPTV</h1>
+  <select id="channelSelect">
+    <option value="">-- Select a Channel --</option>
   </select>
 
-  <ul id="channelList">
-    <li data-channel="dreamworks">DreamWorks HD</li>
-    <li data-channel="cnvg">KAPAMILYA TFC</li>
-    <li data-channel="converge">CONVERGE VISION INFO</li>
-  </ul>
+  <video id="video" controls autoplay></video>
 
   <script>
-    const video = document.getElementById('video');
-    const player = new shaka.Player(video);
-
     const channels = {
       dreamworks: {
         name: "DreamWorks HD",
@@ -71,65 +43,60 @@
         }
       },
       cnvg: {
-        name: "KAPAMILYA TFC",
-        url: "https://d1uf7s78uqso1e.cloudfront.net/out/v1/efa01372657648be830e7c23ff68bea2/index.mpd",
+        name: "HBO",
+        url: "https://qp-pldt-live-grp-03-prod.akamaized.net/out/u/cg_hbohd.mpd",
         keys: {
-          "bd17afb5dc9648a39be79ee3634dd4b8": "3ecf305d54a7729299b93a3d69c02ea5"
+          "4ab9645a2a0a47edbd65e8479c2b9669": "8cb209f1828431ce9b50b593d1f44079"
         }
-      },
-      converge: {
-        name: "CONVERGE VISION INFO",
-        url: "http://143.44.136.110:6910/001/2/ch00000090990000001339/manifest.mpd?virtualDomain=001.live_hls.zte.com",
-        license: {
-          type: "com.widevine.alpha",
-          key: "http://143.44.136.74:9443/widevine/?deviceId=02:00:00:00:00:00"
-        },
-        logo: "https://i.imgur.com/0xo8Ivs.png",
-        group: "🇵🇭 TFC CHANNELS"
       }
     };
 
-    function loadChannel(channelId) {
-      const channel = channels[channelId];
-      if (!channel) return;
+    const select = document.getElementById('channelSelect');
+    const video = document.getElementById('video');
 
-      player.reset().then(() => {
-        let drmConfig = {};
-
-        if (channel.keys) {
-          drmConfig.clearKeys = channel.keys;
-        }
-
-        if (channel.license && channel.license.type && channel.license.key) {
-          drmConfig.servers = {};
-          drmConfig.servers[channel.license.type] = channel.license.key;
-        }
-
-        player.configure({ drm: drmConfig });
-
-        return player.load(channel.url);
-      }).then(() => {
-        console.log("Channel loaded:", channel.name);
-        video.play();
-      }).catch(e => {
-        console.error("Error loading channel:", e);
-      });
+    // Populate dropdown
+    for (const key in channels) {
+      const option = document.createElement('option');
+      option.value = key;
+      option.textContent = channels[key].name;
+      select.appendChild(option);
     }
 
-    document.getElementById('channelDropdown').addEventListener('change', e => {
-      loadChannel(e.target.value);
-    });
+    // Load selected channel
+    select.addEventListener('change', async () => {
+      const selected = select.value;
+      if (!selected) return;
 
-    document.getElementById('channelList').addEventListener('click', e => {
-      if (e.target.tagName === 'LI') {
-        loadChannel(e.target.dataset.channel);
-        document.getElementById('channelDropdown').value = e.target.dataset.channel;
+      const { url, keys } = channels[selected];
+
+      const player = new shaka.Player(video);
+      await player.destroy(); // clear old instance
+      shaka.polyfill.installAll();
+
+      const newPlayer = new shaka.Player(video);
+
+      const keyArray = Object.entries(keys).map(([kid, key]) => ({
+        keyId: kid,
+        key: key
+      }));
+
+      newPlayer.configure({
+        drm: {
+          clearKeys: keyArray.reduce((obj, { keyId, key }) => {
+            obj[keyId] = key;
+            return obj;
+          }, {})
+        }
+      });
+
+      try {
+        await newPlayer.load(url);
+        console.log("Channel loaded:", selected);
+      } catch (e) {
+        console.error("Error loading channel", e);
       }
     });
-
-    document.addEventListener('DOMContentLoaded', () => {
-      loadChannel('dreamworks'); // Load default channel on page load
-    });
   </script>
+
 </body>
 </html>
