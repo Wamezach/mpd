@@ -2,12 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Shaka Player ClearKey Demo</title>
+  <title>IPTV Player - Renkaku Style</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.5/shaka-player.compiled.min.js"></script>
   <style>
     body {
-      background: #121212;
-      color: white;
+      margin: 0;
+      background: #111;
+      color: #fff;
       font-family: sans-serif;
       display: flex;
       flex-direction: column;
@@ -15,63 +16,98 @@
       padding: 2rem;
     }
     video {
-      width: 80%;
-      max-width: 720px;
+      width: 90%;
+      max-width: 960px;
       background: black;
       margin-bottom: 1rem;
     }
-    #log {
-      white-space: pre-wrap;
-      max-width: 720px;
-      height: 100px;
+    select, ul {
+      margin: 0.5rem;
+      padding: 0.5rem;
+      font-size: 16px;
+      width: 300px;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      cursor: pointer;
       background: #222;
+      margin: 5px 0;
       padding: 10px;
-      overflow-y: auto;
       border-radius: 4px;
+    }
+    li:hover {
+      background: #444;
     }
   </style>
 </head>
 <body>
   <video id="video" controls autoplay muted></video>
-  <div id="log">Loading...</div>
+
+  <select id="channelDropdown">
+    <option value="dreamworks">DreamWorks HD</option>
+    <option value="cnvg">Cartoon Network Variant</option>
+  </select>
+
+  <ul id="channelList">
+    <li data-channel="dreamworks">DreamWorks HD</li>
+    <li data-channel="cnvg">Cartoon Network Variant</li>
+  </ul>
 
   <script>
     const video = document.getElementById('video');
-    const logDiv = document.getElementById('log');
-    function log(msg) {
-      console.log(msg);
-      logDiv.textContent += msg + '\n';
-    }
+    const player = new shaka.Player(video);
 
-    async function initPlayer() {
-      const manifestUri = 'https://qp-pldt-live-grp-02-prod.akamaized.net/out/u/cg_dreamworks_hd1.mpd';
+    const channels = {
+      dreamworks: {
+        name: "DreamWorks HD",
+        url: "https://qp-pldt-live-grp-02-prod.akamaized.net/out/u/cg_dreamworks_hd1.mpd",
+        keys: {
+          "4ab9645a2a0a47edbd65e8479c2b9669": "8cb209f1828431ce9b50b593d1f44079"
+        }
+      },
+      cnvg: {
+        name: "Cartoon Network Variant",
+        url: "https://cnvg.katir.workers.dev/1096/manifest.mpd",
+        keys: {
+          "31363231383438333031323033393138": "38694e34324d543478316b7455735437"
+        }
+      }
+    };
 
-      const player = new shaka.Player(video);
+    function loadChannel(channelId) {
+      const channel = channels[channelId];
+      if (!channel) return;
 
-      player.addEventListener('error', (event) => {
-        log('Error: ' + event.detail.code + ' - ' + event.detail.message);
-      });
-
-      // Configure ClearKey DRM with your KID/key pair (hex format, no dashes)
       player.configure({
         drm: {
-          clearKeys: {
-            "4ab9645a2a0a47edbd65e8479c2b9669": "8cb209f1828431ce9b50b593d1f44079"
-          }
+          clearKeys: channel.keys
         }
       });
 
-      try {
-        log('Loading manifest...');
-        await player.load(manifestUri);
-        log('Video loaded successfully, playing...');
-        await video.play();
-      } catch (e) {
-        log('Error loading or playing video: ' + e);
-      }
+      player.load(channel.url).then(() => {
+        console.log("Channel loaded:", channel.name);
+        video.play();
+      }).catch(e => {
+        console.error("Error loading channel:", e);
+      });
     }
 
-    document.addEventListener('DOMContentLoaded', initPlayer);
+    document.getElementById('channelDropdown').addEventListener('change', e => {
+      loadChannel(e.target.value);
+    });
+
+    document.getElementById('channelList').addEventListener('click', e => {
+      if (e.target.tagName === 'LI') {
+        loadChannel(e.target.dataset.channel);
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadChannel('dreamworks'); // Default channel
+    });
   </script>
 </body>
 </html>
