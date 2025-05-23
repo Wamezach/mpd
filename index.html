@@ -44,8 +44,7 @@
     }
 
     async function initPlayer() {
-      // This test manifest supports ClearKey DRM
-      const manifestUri = 'https://storage.googleapis.com/shaka-demo-assets/angel-one/dash.mpd';
+      const manifestUri = 'https://qp-pldt-live-grp-02-prod.akamaized.net/out/u/cg_dreamworks_hd1.mpd';
 
       const player = new shaka.Player(video);
 
@@ -53,12 +52,11 @@
         log('Error: ' + event.detail.code + ' - ' + event.detail.message);
       });
 
-      // ClearKey config with Shaka test keys
+      // Configure ClearKey DRM with your KID/key pair (hex format, no dashes)
       player.configure({
         drm: {
           clearKeys: {
-            // KID : Key (base64url, no padding)
-            "1E8F56484E74333392CFB251035E99ED": "135CD1B624EACF033C0FF89D7A2D3878"
+            "4ab9645a2a0a47edbd65e8479c2b9669": "8cb209f1828431ce9b50b593d1f44079"
           }
         }
       });
