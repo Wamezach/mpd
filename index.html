@@ -49,11 +49,13 @@
   <select id="channelDropdown">
     <option value="dreamworks">DreamWorks HD</option>
     <option value="cnvg">KAPAMILYA TFC</option>
+    <option value="converge">CONVERGE VISION INFO</option>
   </select>
 
   <ul id="channelList">
     <li data-channel="dreamworks">DreamWorks HD</li>
     <li data-channel="cnvg">KAPAMILYA TFC</li>
+    <li data-channel="converge">CONVERGE VISION INFO</li>
   </ul>
 
   <script>
@@ -61,44 +63,52 @@
     const player = new shaka.Player(video);
 
     const channels = {
-  dreamworks: {
-    name: "DreamWorks HD",
-    url: "https://qp-pldt-live-grp-02-prod.akamaized.net/out/u/cg_dreamworks_hd1.mpd",
-    keys: {
-      "4ab9645a2a0a47edbd65e8479c2b9669": "8cb209f1828431ce9b50b593d1f44079"
-    }
-  },
-  cnvg: {
-    name: "KAPAMILYA TFC",
-    url: "https://d1uf7s78uqso1e.cloudfront.net/out/v1/efa01372657648be830e7c23ff68bea2/index.mpd",
-    keys: {
-      "bd17afb5dc9648a39be79ee3634dd4b8": "3ecf305d54a7729299b93a3d69c02ea5"
-    }
-  },
-  converge: {
-    name: "CONVERGE VISION INFO",
-    url: "http://143.44.136.110:6910/001/2/ch00000090990000001339/manifest.mpd?virtualDomain=001.live_hls.zte.com",
-    license: {
-      type: "com.widevine.alpha",
-      key: "http://143.44.136.74:9443/widevine/?deviceId=02:00:00:00:00:00"
-    },
-    logo: "https://i.imgur.com/0xo8Ivs.png",
-    group: "🇵🇭 TFC CHANNELS"
-  }
-};
-
+      dreamworks: {
+        name: "DreamWorks HD",
+        url: "https://qp-pldt-live-grp-02-prod.akamaized.net/out/u/cg_dreamworks_hd1.mpd",
+        keys: {
+          "4ab9645a2a0a47edbd65e8479c2b9669": "8cb209f1828431ce9b50b593d1f44079"
+        }
+      },
+      cnvg: {
+        name: "KAPAMILYA TFC",
+        url: "https://d1uf7s78uqso1e.cloudfront.net/out/v1/efa01372657648be830e7c23ff68bea2/index.mpd",
+        keys: {
+          "bd17afb5dc9648a39be79ee3634dd4b8": "3ecf305d54a7729299b93a3d69c02ea5"
+        }
+      },
+      converge: {
+        name: "CONVERGE VISION INFO",
+        url: "http://143.44.136.110:6910/001/2/ch00000090990000001339/manifest.mpd?virtualDomain=001.live_hls.zte.com",
+        license: {
+          type: "com.widevine.alpha",
+          key: "http://143.44.136.74:9443/widevine/?deviceId=02:00:00:00:00:00"
+        },
+        logo: "https://i.imgur.com/0xo8Ivs.png",
+        group: "🇵🇭 TFC CHANNELS"
+      }
+    };
 
     function loadChannel(channelId) {
       const channel = channels[channelId];
       if (!channel) return;
 
-      player.configure({
-        drm: {
-          clearKeys: channel.keys
-        }
-      });
+      player.reset().then(() => {
+        let drmConfig = {};
 
-      player.load(channel.url).then(() => {
+        if (channel.keys) {
+          drmConfig.clearKeys = channel.keys;
+        }
+
+        if (channel.license && channel.license.type && channel.license.key) {
+          drmConfig.servers = {};
+          drmConfig.servers[channel.license.type] = channel.license.key;
+        }
+
+        player.configure({ drm: drmConfig });
+
+        return player.load(channel.url);
+      }).then(() => {
         console.log("Channel loaded:", channel.name);
         video.play();
       }).catch(e => {
@@ -113,11 +123,12 @@
     document.getElementById('channelList').addEventListener('click', e => {
       if (e.target.tagName === 'LI') {
         loadChannel(e.target.dataset.channel);
+        document.getElementById('channelDropdown').value = e.target.dataset.channel;
       }
     });
 
     document.addEventListener('DOMContentLoaded', () => {
-      loadChannel('dreamworks'); // Default channel
+      loadChannel('dreamworks'); // Load default channel on page load
     });
   </script>
 </body>
