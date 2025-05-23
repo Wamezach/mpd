@@ -227,3 +227,28 @@ button:hover,
     padding: 15px;
   }
 }
+#bannerAd {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: var(--primary-color);
+  color: #fff;
+  text-align: center;
+  padding: 12px 16px;
+  font-size: 1rem;
+  z-index: 1000;
+  box-shadow: 0 -4px 10px var(--shadow-color);
+  animation: slideUp 0.4s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0%);
+    opacity: 1;
+  }
+}
