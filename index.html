@@ -1,52 +1,79 @@
-<video id="video" controls muted></video>
-<button id="playButton">Play</button>
-<div id="log"></div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Shaka Player ClearKey Demo</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.5/shaka-player.compiled.min.js"></script>
+  <style>
+    body {
+      background: #121212;
+      color: white;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+    }
+    video {
+      width: 80%;
+      max-width: 720px;
+      background: black;
+      margin-bottom: 1rem;
+    }
+    #log {
+      white-space: pre-wrap;
+      max-width: 720px;
+      height: 100px;
+      background: #222;
+      padding: 10px;
+      overflow-y: auto;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <video id="video" controls autoplay muted></video>
+  <div id="log">Loading...</div>
 
-<script>
-  const video = document.getElementById('video');
-  const logDiv = document.getElementById('log');
-  function log(msg) {
-    console.log(msg);
-    logDiv.textContent += msg + '\n';
-  }
+  <script>
+    const video = document.getElementById('video');
+    const logDiv = document.getElementById('log');
+    function log(msg) {
+      console.log(msg);
+      logDiv.textContent += msg + '\n';
+    }
 
-  async function initPlayer() {
-    const manifestUri = "https://qp-pldt-live-grp-04-prod.akamaized.net/out/u/pbo_sd.mpd";
-    const player = new shaka.Player(video);
+    async function initPlayer() {
+      // This test manifest supports ClearKey DRM
+      const manifestUri = 'https://storage.googleapis.com/shaka-demo-assets/angel-one/dash.mpd';
 
-    player.addEventListener('error', (event) => {
-      log('Error code ' + event.detail.code + ': ' + event.detail.message);
-    });
+      const player = new shaka.Player(video);
 
-    player.configure({
-      drm: {
-        clearKeys: {
-          "3L2pZmLUGIvflfnwyl6DA": "MeVStQb0pXPLmKRs8HHoQ"
+      player.addEventListener('error', (event) => {
+        log('Error: ' + event.detail.code + ' - ' + event.detail.message);
+      });
+
+      // ClearKey config with Shaka test keys
+      player.configure({
+        drm: {
+          clearKeys: {
+            // KID : Key (base64url, no padding)
+            "1E8F56484E74333392CFB251035E99ED": "135CD1B624EACF033C0FF89D7A2D3878"
+          }
         }
+      });
+
+      try {
+        log('Loading manifest...');
+        await player.load(manifestUri);
+        log('Video loaded successfully, playing...');
+        await video.play();
+      } catch (e) {
+        log('Error loading or playing video: ' + e);
       }
-    });
-
-    try {
-      log('Loading manifest...');
-      await player.load(manifestUri);
-      log('Video loaded successfully');
-      // Delay play to avoid race conditions
-      setTimeout(() => {
-        video.play().catch(e => log('Video play() failed: ' + e.message));
-      }, 500);
-    } catch (e) {
-      log('Error loading or playing video: ' + e);
     }
-  }
 
-  document.getElementById('playButton').addEventListener('click', async () => {
-    try {
-      await video.play();
-      log('Video playing after user interaction');
-    } catch (e) {
-      log('Play failed: ' + e.message);
-    }
-  });
-
-  document.addEventListener('DOMContentLoaded', initPlayer);
-</script>
+    document.addEventListener('DOMContentLoaded', initPlayer);
+  </script>
+</body>
+</html>
