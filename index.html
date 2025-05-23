@@ -1,85 +1,52 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Shaka Player with ClearKey DRM</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.5/shaka-player.compiled.min.js"></script>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background-color: #121212;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      color: white;
-      font-family: sans-serif;
-      flex-direction: column;
-    }
-    video {
-      width: 80%;
-      max-width: 960px;
-      background: black;
-    }
-    #log {
-      margin-top: 1rem;
-      width: 80%;
-      max-width: 960px;
-      white-space: pre-wrap;
-      background: #222;
-      padding: 10px;
-      border-radius: 5px;
-      font-size: 14px;
-      height: 100px;
-      overflow-y: auto;
-    }
-  </style>
-</head>
-<body>
-  <video id="video" controls autoplay muted></video>
-  <div id="log">Loading...</div>
+<video id="video" controls muted></video>
+<button id="playButton">Play</button>
+<div id="log"></div>
 
-  <script>
-    const logDiv = document.getElementById('log');
-    function log(msg) {
-      console.log(msg);
-      logDiv.textContent += msg + '\n';
-    }
+<script>
+  const video = document.getElementById('video');
+  const logDiv = document.getElementById('log');
+  function log(msg) {
+    console.log(msg);
+    logDiv.textContent += msg + '\n';
+  }
 
-    async function initPlayer() {
-      const manifestUri = "https://qp-pldt-live-grp-04-prod.akamaized.net/out/u/pbo_sd.mpd";
+  async function initPlayer() {
+    const manifestUri = "https://qp-pldt-live-grp-04-prod.akamaized.net/out/u/pbo_sd.mpd";
+    const player = new shaka.Player(video);
 
-      const video = document.getElementById('video');
-      const player = new shaka.Player(video);
+    player.addEventListener('error', (event) => {
+      log('Error code ' + event.detail.code + ': ' + event.detail.message);
+    });
 
-      player.addEventListener('error', (event) => {
-        log('Error code ' + event.detail.code + ': ' + event.detail.message);
-      });
-
-      player.configure({
-        drm: {
-          clearKeys: {
-            "3L2pZmLUGIvflfnwyl6DA": "MeVStQb0pXPLmKRs8HHoQ"
-          }
+    player.configure({
+      drm: {
+        clearKeys: {
+          "3L2pZmLUGIvflfnwyl6DA": "MeVStQb0pXPLmKRs8HHoQ"
         }
-      });
-
-      try {
-        log('Loading manifest...');
-        await player.load(manifestUri);
-        log('Video loaded successfully');
-        // Play and handle promise rejection gracefully
-        video.play().catch(error => {
-          log('Video play() failed: ' + error.message);
-          // You can add UI to prompt user interaction here if needed
-        });
-      } catch (e) {
-        log('Error loading or playing video: ' + e);
       }
-    }
+    });
 
-    document.addEventListener('DOMContentLoaded', initPlayer);
-  </script>
-</body>
-</html>
+    try {
+      log('Loading manifest...');
+      await player.load(manifestUri);
+      log('Video loaded successfully');
+      // Delay play to avoid race conditions
+      setTimeout(() => {
+        video.play().catch(e => log('Video play() failed: ' + e.message));
+      }, 500);
+    } catch (e) {
+      log('Error loading or playing video: ' + e);
+    }
+  }
+
+  document.getElementById('playButton').addEventListener('click', async () => {
+    try {
+      await video.play();
+      log('Video playing after user interaction');
+    } catch (e) {
+      log('Play failed: ' + e.message);
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', initPlayer);
+</script>
