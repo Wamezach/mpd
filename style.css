@@ -240,6 +240,8 @@ button:hover,
   z-index: 1000;
   box-shadow: 0 -4px 10px var(--shadow-color);
   animation: slideUp 0.4s ease-out;
+  /* Add safe area inset to avoid overlap with nav bars */
+  padding-bottom: calc(12px + env(safe-area-inset-bottom));
 }
 
 @keyframes slideUp {
@@ -252,3 +254,21 @@ button:hover,
     opacity: 1;
   }
 }
+
+/* Responsive tweaks for smaller screens (mobile/Android) */
+@media (max-width: 480px) {
+  #bannerAd {
+    font-size: 0.9rem;
+    padding: 10px 12px;
+    /* slightly less padding for small screen */
+  }
+}
+
+/* Optional: even smaller font for very narrow devices */
+@media (max-width: 320px) {
+  #bannerAd {
+    font-size: 0.85rem;
+    padding: 8px 10px;
+  }
+}
+
