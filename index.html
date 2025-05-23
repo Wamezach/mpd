@@ -69,7 +69,11 @@
         log('Loading manifest...');
         await player.load(manifestUri);
         log('Video loaded successfully');
-        await video.play();
+        // Play and handle promise rejection gracefully
+        video.play().catch(error => {
+          log('Video play() failed: ' + error.message);
+          // You can add UI to prompt user interaction here if needed
+        });
       } catch (e) {
         log('Error loading or playing video: ' + e);
       }
