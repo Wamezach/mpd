@@ -12,14 +12,6 @@ const channels = {
     keys: {
       "bd17afb5dc9648a39be79ee3634dd4b8": "3ecf305d54a7729299b93a3d69c02ea5"
     }
-  },
-  converge: {
-    name: "CONVERGE VISION INFO",
-    url: "http://143.44.136.110:6910/001/2/ch00000090990000001339/manifest.mpd?virtualDomain=001.live_hls.zte.com",
-    license: {
-      type: "com.widevine.alpha",
-      url: "http://143.44.136.74:9443/widevine/?deviceId=02:00:00:00:00:00"
-    }
   }
 };
 
