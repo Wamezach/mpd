@@ -271,4 +271,20 @@ button:hover,
     padding: 8px 10px;
   }
 }
+.adsterra-banner {
+    display: none;
+    text-align: center;
+    margin: 10px auto;
+  }
 
+  @media (min-width: 769px) {
+    #ad-728x90 { display: block; }
+  }
+
+  @media (min-width: 481px) and (max-width: 768px) {
+    #ad-468x60 { display: block; }
+  }
+
+  @media (max-width: 480px) {
+    #ad-320x50 { display: block; }
+  }
