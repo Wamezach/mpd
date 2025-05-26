@@ -286,3 +286,28 @@ button:hover,
   @media (max-width: 480px) {
     #ad-320x50 { display: block; }
   }
+header {
+  padding: 4px 8px;
+  background-color: var(--primary-color); /* Optional: set your main theme color */
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: auto;
+  min-height: 40px;
+}
+
+.brand-title {
+  font-size: clamp(1rem, 3vw, 1.5rem); /* Responsive font size */
+  margin: 0;
+  line-height: 1.2;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+@media (max-width: 360px) {
+  .brand-title {
+    font-size: 0.95rem;
+  }
+}
