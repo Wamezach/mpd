@@ -617,7 +617,6 @@ select.addEventListener('change', async () => {
   const channel = channels[selected];
   if (!channel) return;
 
-  // Destroy old instance
   if (player) {
     await player.destroy();
   }
@@ -625,20 +624,16 @@ select.addEventListener('change', async () => {
   shaka.polyfill.installAll();
   player = new shaka.Player(video);
 
-  // Error handler
   player.addEventListener('error', e => {
     console.error('Error code', e.detail.code, 'object', e.detail);
   });
 
-  // Configure DRM
   const drmConfig = {};
 
-  // ClearKey
   if (channel.keys) {
     drmConfig.clearKeys = channel.keys;
   }
 
-  // Widevine
   if (channel.license && channel.license.type && channel.license.url) {
     drmConfig.servers = {
       [channel.license.type]: channel.license.url
@@ -651,8 +646,16 @@ select.addEventListener('change', async () => {
     await player.load(channel.url);
     console.log("Loaded channel:", channel.name);
     video.play();
+
+    // Scroll to the video container
+    document.querySelector('.player-wrapper').scrollIntoView({
+      behavior: 'smooth',
+      block: 'center'
+    });
+
   } catch (error) {
     console.error("Failed to load channel:", error);
   }
 });
+
 
