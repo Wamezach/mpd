@@ -231,18 +231,16 @@ button:hover,
   position: fixed;
   bottom: 0;
   left: 0;
-  width: 100%;
-  background-color: var(--primary-color);
-  color: #fff;
-  text-align: center;
-  padding: 12px 16px;
-  font-size: 1rem;
+  right: 0;
+  width: 100vw;
+  height: 50px; /* Adjust to match the actual height of your ad iframe */
+  background-color: var(--primary-color); /* Optional */
+  color: #fff; /* Optional */
   z-index: 1000;
-  box-shadow: 0 -4px 10px var(--shadow-color);
   animation: slideUp 0.4s ease-out;
-  /* Add safe area inset to avoid overlap with nav bars */
-  padding-bottom: calc(12px + env(safe-area-inset-bottom));
+  overflow: hidden;
 }
+
 
 @keyframes slideUp {
   from {
