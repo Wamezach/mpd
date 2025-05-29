@@ -311,3 +311,31 @@ header {
     font-size: 0.95rem;
   }
 }
+header {
+    padding: 1rem;
+  }
+
+  .top-bar {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap; /* ensures responsiveness */
+  }
+
+  .brand-title {
+    font-size: 2rem;
+    margin: 0;
+  }
+
+  .channel-select-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  /* Only apply the horizontal layout on wider screens (like PCs) */
+  @media (min-width: 768px) {
+    .top-bar {
+      flex-direction: row;
+    }
+  }
