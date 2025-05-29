@@ -315,23 +315,50 @@ header {
     padding: 1rem;
   }
 
-  .top-bar {
-    display: flex;
-    align-items: center;
-    gap: 2rem;
-    flex-wrap: wrap; /* ensures responsiveness */
-  }
+.top-bar {
+  display: flex;
+  flex-wrap: wrap;               /* Allows wrapping on small screens */
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem;
+  max-width: 100%;               /* Prevent overflow */
+  box-sizing: border-box;
+}
 
-  .brand-title {
-    font-size: 2rem;
-    margin: 0;
-  }
+.brand-title {
+  font-size: 1.5rem;
+  margin: 0;
+  flex-shrink: 0;                /* Prevent shrinking */
+}
 
+.channel-select-group {
+  display: flex;
+  flex-wrap: wrap;               /* Allows label and select to stack if needed */
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 200px;
+  flex: 1 1 auto;                /* Allow to grow/shrink as needed */
+}
+
+select {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Optional: tighter layout for narrow screens */
+@media (max-width: 480px) {
   .channel-select-group {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+    flex-direction: column;
+    align-items: flex-start;
   }
+
+  .top-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
 
   /* Only apply the horizontal layout on wider screens (like PCs) */
   @media (min-width: 768px) {
