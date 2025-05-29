@@ -318,53 +318,51 @@ header {
 /* Base styles for the top bar */
 .top-bar {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 0.5rem 1rem; /* Reduced padding for smaller screens */
+  padding: 0.5rem 1rem;
+  flex-wrap: nowrap; /* No wrapping on desktop */
   max-width: 100%;
   box-sizing: border-box;
 }
 
-/* Brand title styling */
+/* Title stays compact */
 .brand-title {
-  font-size: 1.2rem; /* Adjusted font size for better fit */
+  font-size: 1.2rem;
   margin: 0;
-  flex-shrink: 0;
+  white-space: nowrap;
 }
 
-/* Channel select group styling */
+/* Label and dropdown inline */
 .channel-select-group {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
-  min-width: 200px;
-  flex: 1 1 auto;
+  white-space: nowrap;
 }
 
-/* Select element styling */
+/* Optional: Full width dropdown on mobile */
 select {
   max-width: 100%;
   box-sizing: border-box;
 }
 
-/* Responsive adjustments for screens narrower than 480px */
+/* For small screens: stack vertically */
 @media (max-width: 480px) {
   .top-bar {
     flex-direction: column;
     align-items: flex-start;
-    padding: 0.5rem; /* Further reduced padding for very small screens */
-  }
-
-  .brand-title {
-    font-size: 1rem; /* Smaller font size for narrow screens */
   }
 
   .channel-select-group {
     flex-direction: column;
     align-items: flex-start;
+    width: 100%;
+  }
+
+  select {
+    width: 100%;
   }
 }
 
